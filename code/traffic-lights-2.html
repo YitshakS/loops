@@ -1,0 +1,46 @@
+<style>
+  .🚦 {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 60px;
+    padding: 8px;
+    background: #222;
+    border-radius: 12px;
+    font-size: 40px;
+    line-height: 1.1;
+    text-align: center
+  }
+
+  .🚦 input {
+    display: none
+  }
+
+  .🚦 label {
+    opacity: .15;
+    cursor: pointer;
+    user-select: none
+  }
+
+  .🚦 label::after {
+    content: '';
+    position: absolute;
+    inset: 0
+  }
+
+  .🚦 :checked+label {
+    opacity: 1
+  }
+
+  .🚦:has(#🔴:checked) [for=🟡],
+  .🚦:has(#🟡:checked) [for=🟢],
+  .🚦:has(#🟢:checked) [for=🔴] {
+    z-index: 1
+  }
+</style>
+
+<div class=🚦>
+  <input type=radio name=state id=🔴 checked><label for=🔴>🔴</label>
+  <input type=radio name=state id=🟡        ><label for=🟡>🟡</label>
+  <input type=radio name=state id=🟢        ><label for=🟢>🟢</label>
+</div>

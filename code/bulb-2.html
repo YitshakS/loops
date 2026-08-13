@@ -1,0 +1,19 @@
+<style>
+	#toggle {
+		display: none;
+	}
+
+	label {
+		font-size: 200px;
+		cursor: pointer;
+		filter: grayscale(1) brightness(0.5);
+		user-select: none;
+	}
+
+	#toggle:checked~label {
+		filter: none;
+	}
+</style>
+
+<input type="checkbox" id="toggle">
+<label for="toggle">💡</label>

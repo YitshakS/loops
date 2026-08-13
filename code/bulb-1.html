@@ -1,0 +1,14 @@
+<style>
+	.img1, #toggle:checked~.img2 {
+		display: block;
+		cursor: pointer;
+	}
+
+	input, .img2, #toggle:checked~.img1 {
+		display: none;
+	}
+</style>
+
+<input type="checkbox" id="toggle">
+<label for="toggle" class="img-wrap img1"><img src="1.png"></label>
+<label for="toggle" class="img-wrap img2"><img src="2.png"></label>

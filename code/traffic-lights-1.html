@@ -1,0 +1,43 @@
+<style>
+  .🚦 {
+    position: relative;
+    width: 60px;
+    padding: 8px;
+    background: #222;
+    border-radius: 12px;
+    font-size: 40px;
+    line-height: 1.1;
+    text-align: center
+  }
+
+  .🚦 input {
+    display: none
+  }
+
+  .🚦 div {
+    opacity: .15;
+    user-select: none
+  }
+
+  .🚦 :checked+div {
+    opacity: 1
+  }
+
+  .🚦 label {
+    position: absolute;
+    inset: 0;
+    cursor: pointer
+  }
+
+  #🔴:checked~[for=🟡],
+  #🟡:checked~[for=🟢],
+  #🟢:checked~[for=🔴] {
+    z-index: 1
+  }
+</style>
+
+<div class=🚦>
+  <input type=radio name=state id=🔴 checked><div>🔴</div><label for=🟡></label>
+  <input type=radio name=state id=🟡        ><div>🟡</div><label for=🟢></label>
+  <input type=radio name=state id=🟢        ><div>🟢</div><label for=🔴></label>
+</div>
