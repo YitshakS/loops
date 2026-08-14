@@ -1,0 +1,234 @@
+<!-- https://codepen.io/tameraydin/pen/kMYreE -->
+
+<meta charset="utf-8">
+<style>
+  /* ═══════════ 1. דף ופריסה ═══════════ */
+  * {
+    box-sizing: border-box
+  }
+
+  body {
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    direction: rtl;
+    background: linear-gradient(to bottom, #071a1e 0%, #274249 100%)
+  }
+
+  p {
+    margin: 0;
+    color: #bbb;
+    font-size: 14px
+  }
+
+  /* ═══════════ 2. מבנה ומראה (סטטי בלבד) ═══════════ */
+  .stage {
+    position: relative;
+    perspective: 810px;
+    width: 135px;
+    height: 135px
+  }
+
+  /* שכבת לחיצה שקופה (מעט גדולה מהקובייה כדי לתפוס בליטות בסיבוב); נעולה כברירת מחדל */
+  .lbl {
+    position: absolute;
+    inset: -25px;
+    z-index: 5;
+    cursor: pointer;
+    pointer-events: none
+  }
+
+  .roller,
+  .cube {
+    display: block;
+    position: relative;
+    width: 135px;
+    height: 135px;
+    transform-style: preserve-3d
+  }
+
+  /* פאה חיצונית: לבנה, רדיוס גדול, הצללה פנימית רכה */
+  /* פאה: ריבוע לבן עם ספרת קובייה (יוניקוד), גדולה כדי לכסות מסגרת כפולה */
+  .face {
+    position: absolute;
+    width: 135px;
+    height: 135px;
+    --z: 67px;
+    background: #fff;
+    box-shadow: inset 0 0 27px #ccc;
+    border-radius: 25px
+  }
+
+  .pip {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 304px;
+    line-height: 1;
+    color: #333;
+    user-select: none;
+    -webkit-user-select: none
+  }
+
+  /* 8 משולשי פינות (הפתרון שלנו) — במישור התחלת הרדיוס (radius 25 → translateZ 102.19) */
+  .plug {
+    position: absolute;
+    width: 37px;
+    height: 37px;
+    left: 49px;
+    top: 49px;
+    background: #e0e0e0;
+    clip-path: polygon(50% 0%, 7% 75%, 93% 75%)
+  }
+
+  .p1 {
+    transform: rotateY(45deg) rotateX(-35.26deg) translateZ(102.19px)
+  }
+
+  .p2 {
+    transform: rotateY(-45deg) rotateX(-35.26deg) translateZ(102.19px)
+  }
+
+  .p3 {
+    transform: rotateY(45deg) rotateX(35.26deg) rotateZ(60deg) translateZ(102.19px)
+  }
+
+  .p4 {
+    transform: rotateY(-45deg) rotateX(35.26deg) rotateZ(60deg) translateZ(102.19px)
+  }
+
+  .p5 {
+    transform: rotateY(135deg) rotateX(-35.26deg) translateZ(102.19px)
+  }
+
+  .p6 {
+    transform: rotateY(-135deg) rotateX(-35.26deg) translateZ(102.19px)
+  }
+
+  .p7 {
+    transform: rotateY(135deg) rotateX(35.26deg) rotateZ(60deg) translateZ(102.19px)
+  }
+
+  .p8 {
+    transform: rotateY(-135deg) rotateX(35.26deg) rotateZ(60deg) translateZ(102.19px)
+  }
+
+  /* מיקום 6 הפאות במרחב (משותף ל-face ול-inner; --z שונה) */
+  .front {
+    transform: translateZ(var(--z))
+  }
+
+  .back {
+    transform: rotateY(180deg) translateZ(var(--z))
+  }
+
+  .right {
+    transform: rotateY(90deg) translateZ(var(--z))
+  }
+
+  .left {
+    transform: rotateY(-90deg) translateZ(var(--z))
+  }
+
+  .top {
+    transform: rotateX(90deg) translateZ(var(--z))
+  }
+
+  .bottom {
+    transform: rotateX(-90deg) translateZ(var(--z))
+  }
+
+  /* ═══════════ 3. אנימציות ═══════════ */
+  @keyframes spinX {
+    to {
+      transform: rotateX(360deg)
+    }
+  }
+
+  @keyframes spinY {
+    to {
+      transform: rotateY(360deg)
+    }
+  }
+
+  @keyframes throw {
+    from {
+      transform: rotateX(720deg) rotateY(1080deg)
+    }
+
+    to {
+      transform: none
+    }
+  }
+
+  /* ═══════════ 4. לוגיקת אינטראקציה ═══════════ */
+  #chk {
+    display: none
+  }
+
+  /* ה-checkbox הנסתר = הזיכרון היחיד */
+
+  /* מנוחה: סיבוב איטי (שני צירים ביחס ~φ → הגרלה הוגנת). הלחיצה נעולה — ראה .lbl בקטע 2 */
+  .cube {
+    animation: spinX 20s linear infinite, spinY 12.36s linear infinite;
+    animation-composition: add
+  }
+
+  /* ריחוף: מהיר, והלחיצה נפתחת — רק בזמן המהירות הגבוהה שאי אפשר לכוון */
+  #chk:not(:checked)~.stage:hover .cube {
+    animation-duration: .25s, .155s
+  }
+
+  #chk:not(:checked)~.stage:hover .lbl {
+    pointer-events: auto
+  }
+
+  /* לחיצה: מקפיא על המיקום המהיר (בלתי-צפוי, לא חוזר לאיטי!) + האטה עד עצירה */
+  #chk:checked~.stage .cube {
+    animation-play-state: paused;
+    animation-duration: .25s, .155s
+  }
+
+  #chk:checked~.stage .roller {
+    animation: throw 3.5s cubic-bezier(.2, .55, .25, 1) both
+  }
+
+  #chk:checked~.stage .lbl {
+    pointer-events: auto
+  }
+
+  /* עצור: לחיצה נוספת מגלגלת שוב */
+</style>
+
+<input type="checkbox" id="chk">
+<div class="stage">
+  <label class="lbl" for="chk"></label>
+  <div class="roller">
+    <div class="cube">
+      <div class="plug p1"></div>
+      <div class="plug p2"></div>
+      <div class="plug p3"></div>
+      <div class="plug p4"></div>
+      <div class="plug p5"></div>
+      <div class="plug p6"></div>
+      <div class="plug p7"></div>
+      <div class="plug p8"></div>
+      <div class="face front"><span class="pip">⚀</span></div>
+      <div class="face back"><span class="pip">⚅</span></div>
+      <div class="face right"><span class="pip">⚁</span></div>
+      <div class="face left"><span class="pip">⚄</span></div>
+      <div class="face top"><span class="pip">⚂</span></div>
+      <div class="face bottom"><span class="pip">⚃</span></div>
+    </div>
+  </div>
+</div>
+<p>הקלק על הקובייה כדי להגריל מספר</p>
